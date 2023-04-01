@@ -1,15 +1,24 @@
 import itertools
 import hashlib
+import os
 
 
 def retrieve_input_file_info(inputDataFile):
     """ Read a file and convert content into an array of arrays of each line elements """
 
     try:
+        os.path.exists(inputDataFile)
+    except:
+        return "The file you entered does not exist."
+    try:
+        os.stat(inputDataFile).st_size
+    except:
+        return "Make sure that your file is not empty."
+    try:
         inputFile = open(inputDataFile, "r")
         LinesRead = inputFile.readlines()
     except:
-        return "Wrong file format. Please make sure that it is .txt file. "
+        return "Wrong file format. Please make sure that it is txt file."
     
     arr_of_lines = []
     array_of_line_items = []
@@ -26,9 +35,10 @@ def retrieve_input_file_info(inputDataFile):
     inputFile.close()
     return array_of_line_items
 
+
 def generate_passwords(max_length, array_of_line_items):
-    """ creates an array of passwords """
-    
+    """ Creates an array of passwords """
+
     array_of_passwords = []
     output_dictionary = {}
     dictionary_accepted_characters = { 'A':'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F', 'G':'G', 'H':'H', 
@@ -58,7 +68,6 @@ def generate_passwords(max_length, array_of_line_items):
                 hashed_salted_password = hashlib.sha256(salted_password.encode('utf-8')).hexdigest()       
                 if(hashed_salted_password == arr[1]):
                     output_dictionary[arr[0]] = password
-
         # handle remaining elements in array_of_line_items
         for array in array_of_line_items:
             if array[0] not in output_dictionary:
@@ -66,13 +75,18 @@ def generate_passwords(max_length, array_of_line_items):
     except:
         return "Invalid input file. Make sure it's .txt file and exists in correct directory."
 
-    return list(output_dictionary.items()) # display tuple of key and value pair
+    return list(output_dictionary.items()) # display list of tuples of user id and password pairs
 
 
 def user_input():
     """ Accepts user input and renders passwords generated using password generator function """
     
-    input_file = input("Enter your input file: ")
+    try:
+        input_file = input("Enter your input file: ")
+        os.path.exists(input_file)
+        os.stat(input_file).st_size
+    except:
+        return "Make sure that your file exists and is not empty."
     try:
         max_password_length = int(input("Enter maximum password length (Example 4): "))
     except:
